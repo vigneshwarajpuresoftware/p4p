@@ -221,6 +221,37 @@ jobs:
             python: "3.9"
             piparch: win_amd64
             profile: latest
+        
+           # Aarch64 py builds
+          - name: linux 3.6 aarch64
+            os: ubuntu-latest
+            pyver: cp36-cp36m
+            piparch: manylinux2014_aarch64
+            numpy: numpy==1.19.0
+            cython: Cython==0.29.2
+
+          - name: linux 3.7 aarch64
+            os: ubuntu-latest
+            pyver: cp37-cp37m
+            piparch: manylinux2014_aarch64
+            numpy: numpy==1.19.0
+            cython: Cython==0.29.2
+            
+          - name: linux 3.8 aarch64
+            os: ubuntu-latest
+            pyver: cp38-cp38m
+            piparch: manylinux2014_aarch64
+            numpy: numpy==1.17.3
+            cython: Cython==0.29.2
+            pre: linux32
+
+          - name: linux 3.9 aarch64
+            os: ubuntu-latest
+            pyver: cp39-cp39m
+            piparch: manylinux2014_aarch64
+            numpy: numpy==1.19.3
+            cython: Cython==0.29.23
+            pre: linux32
 
     steps:
       - uses: actions/checkout@v2
@@ -326,9 +357,21 @@ jobs:
           then
             python -m pip install --only-binary numpy -r requirements-${{ matrix.profile }}.txt
           else
-            python -m pip install --only-binary numpy nose2 ply cothread ${{ matrix.numpy }} ${{ matrix.cython }}
+            if [ "${{ matrix.piparch }}" == manylinux2014_aarch64 ]
+            then
+              yum group install -y "Development Tools"
+              yum install -y man-pages
+              yum install -y python3-devel
+              yum install -y python3-pip
+              git clone https://github.com/dls-controls/cothread.git
+              cd cothread
+              python3 setup.py install
+              cd ..
+              python -m pip install --only-binary numpy nose2 ply cothread ${{ matrix.numpy }} ${{ matrix.cython }}
+            else
+              python -m pip install --only-binary numpy nose2 ply cothread ${{ matrix.numpy }} ${{ matrix.cython }}
+            fi
           fi
-
           python -m pip wheel -v -w dist --no-index --no-deps \
            --no-build-isolation --no-use-pep517 \
            --build-option --plat-name=${{ matrix.piparch }} \
@@ -337,8 +380,12 @@ jobs:
 
           cd dist
           python -m pip install p4p*.whl
+          if [ "${{ matrix.piparch }}" == manylinux2014_aarch64 ]
+          then
+          python -m nose2
+          else
           python -m nose2 -v p4p
-
+          fi
           EOF
           cat runit.sh
           chmod +x runit.sh
