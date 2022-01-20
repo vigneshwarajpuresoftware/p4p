@@ -384,12 +384,7 @@ jobs:
 
           cd dist
           python -m pip install p4p*.whl
-          if [ "${{ matrix.piparch }}" == manylinux2014_aarch64 ]
-          then
-          python -m nose2
-          else
           python -m nose2 -v p4p
-          fi
           EOF
           cat runit.sh
           chmod +x runit.sh
