@@ -363,14 +363,11 @@ jobs:
           else
             if [ "${{ matrix.piparch }}" == manylinux2014_aarch64 ]
             then
-              yum group install -y "Development Tools"
-              yum install -y man-pages
-              yum install -y python3-devel
               yum install -y python3-pip
-              git clone https://github.com/dls-controls/cothread.git
-              cd cothread
-              python3 setup.py install
-              cd ..
+              wget https://github.com/dls-controls/cothread/archive/refs/tags/2-18.tar.gz
+              tar -xvf 2-18.tar.gz
+              cd cothread-2-18/
+              python setup.py install
               python -m pip install --only-binary numpy nose2 ply cothread ${{ matrix.numpy }} ${{ matrix.cython }}
             else
               python -m pip install --only-binary numpy nose2 ply cothread ${{ matrix.numpy }} ${{ matrix.cython }}
