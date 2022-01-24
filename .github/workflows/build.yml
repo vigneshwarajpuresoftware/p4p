@@ -364,6 +364,8 @@ jobs:
             if [ "${{ matrix.piparch }}" == manylinux2014_aarch64 ]
             then
               yum install -y python3-pip
+              yum search wget
+              yum install -y wget
               wget https://github.com/dls-controls/cothread/archive/refs/tags/2-18.tar.gz
               tar -xvf 2-18.tar.gz
               cd cothread-2-18/
