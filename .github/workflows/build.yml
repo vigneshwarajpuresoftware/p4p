@@ -379,8 +379,7 @@ jobs:
            --no-build-isolation --no-use-pep517 \
            --build-option --plat-name=${{ matrix.piparch }} \
            $PRE \
-           dist/*.tar.*
-
+          dist/*.tar.*
           cd dist
           python -m pip install p4p*.whl
           python -m nose2 -v p4p
